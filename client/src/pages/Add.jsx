@@ -11,17 +11,30 @@ const Add = () => {
     cover: "",
   });
   const [error,setError] = useState(false)
+  const [image, setImage] = useState()
 
   const navigate = useNavigate();
 
   const handleChange = (e) => {
-    setBook((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    if (e?.target?.files?.[0]) {
+      setImage(URL.createObjectURL(e.target.files[0]))
+      setBook((prev) => ({ ...prev, [e.target.name]: e.target.files[0] }));
+      console.log('file', e.target.files[0])
+    } else {
+      setBook((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    }
   };
 
   const handleClick = async (e) => {
     e.preventDefault();
+    const formData = new FormData();
+    formData.append('title', book.title)
+    formData.append('desc', book.desc)
+    formData.append('price', book.price)
+    formData.append('file', book.cover)
+
     try {
-      await axios.post("http://localhost:8800/books", book);
+      await axios.post("http://localhost:8800/books", formData);
       navigate("/");
     } catch (err) {
       console.log(err);
@@ -52,11 +65,17 @@ const Add = () => {
         onChange={handleChange}
       />
       <input
-        type="text"
+        type="file"
         placeholder="Book cover"
         name="cover"
         onChange={handleChange}
       />
+      {image && <img 
+         alt="preview image" 
+         src={image} 
+         height="100"
+         width="100"
+      />}
       <button onClick={handleClick}>Add</button>
       {error && "Something went wrong!"}
       <Link to="/">See all books</Link>

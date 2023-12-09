@@ -2,10 +2,25 @@ import express from "express";
 import mysql from "mysql";
 import cors from "cors";
 import 'dotenv/config';
+import multer from 'multer';
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    //cb(null, 'uploads/')
+    //uploading to clent section
+    cb(null, '../client/public/uploads/')
+  },
+  filename: function (req, file, cb) {
+    const uniquePrefix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+    cb(null, uniquePrefix + '_' + file.originalname.replace(/\s+/g, ""))
+  }
+})
+
+const upload = multer({ storage: storage })
 
 app.listen(8800, () => {
   console.log("Connected to backend.");
@@ -36,14 +51,16 @@ app.get("/books", (req, res) => {
   });
 });
 
-app.post("/books", (req, res) => {
+app.post("/books", upload.single('file'), (req, res) => {
+  const file = req.file;
+
   const q = "INSERT INTO books(`title`, `desc`, `price`, `cover`) VALUES (?)";
 
   const values = [
     req.body.title,
     req.body.desc,
     req.body.price,
-    req.body.cover,
+    file.filename,
   ];
 
   db.query(q, [values], (err, data) => {

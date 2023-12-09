@@ -7,24 +7,24 @@ import { Link } from "react-router-dom";
 const Books = () => {
   const [books, setBooks] = useState([]);
 
+  const fetchAllBooks = async () => {
+    try {
+      const res = await axios.get("http://localhost:8800/books");
+      setBooks(res.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   useEffect(() => {
-    const fetchAllBooks = async () => {
-      try {
-        const res = await axios.get("http://localhost:8800/books");
-        setBooks(res.data);
-      } catch (err) {
-        console.log(err);
-      }
-    };
     fetchAllBooks();
   }, []);
-
-  console.log(books);
 
   const handleDelete = async (id) => {
     try {
       await axios.delete(`http://localhost:8800/books/${id}`);
-      window.location.reload()
+
+      fetchAllBooks();
     } catch (err) {
       console.log(err);
     }
@@ -32,11 +32,11 @@ const Books = () => {
 
   return (
     <div>
-      <h1>Lama Book Shop</h1>
+      <h1>Book Shop</h1>
       <div className="books">
         {books.map((book) => (
           <div key={book.id} className="book">
-            <img src={book.cover} alt="" />
+            <img src={`/uploads/${book.cover}`} alt="" />
             <h2>{book.title}</h2>
             <p>{book.desc}</p>
             <span>${book.price}</span>
