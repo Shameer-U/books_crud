@@ -50,6 +50,7 @@ const Add = () => {
         placeholder="Book title"
         name="title"
         onChange={handleChange}
+        value={book?.title}
       />
       <textarea
         rows={5}
@@ -57,12 +58,14 @@ const Add = () => {
         placeholder="Book desc"
         name="desc"
         onChange={handleChange}
+        value={book?.desc}
       />
       <input
         type="number"
         placeholder="Book price"
         name="price"
         onChange={handleChange}
+        value={book?.price}
       />
       <input
         type="file"

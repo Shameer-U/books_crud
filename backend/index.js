@@ -79,18 +79,29 @@ app.delete("/books/:id", (req, res) => {
   });
 });
 
-app.put("/books/:id", (req, res) => {
+app.put("/books/:id",  upload.single('file'), (req, res) => {
   const bookId = req.params.id;
+  const file = req.file;
   const q = "UPDATE books SET `title`= ?, `desc`= ?, `price`= ?, `cover`= ? WHERE id = ?";
 
   const values = [
     req.body.title,
     req.body.desc,
     req.body.price,
-    req.body.cover,
+    file.filename,
   ];
 
-  db.query(q, [...values,bookId], (err, data) => {
+  db.query(q, [...values, bookId], (err, data) => {
+    if (err) return res.send(err);
+    return res.json(data);
+  });
+});
+
+app.get("/books/:id", (req, res) => {
+  const bookId = req.params.id;
+  const q = "SELECT * FROM books WHERE id = ?";
+
+  db.query(q, [bookId], (err, data) => {
     if (err) return res.send(err);
     return res.json(data);
   });
